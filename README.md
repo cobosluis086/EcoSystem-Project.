@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # EcoSystem Connect
 
 Proyecto desarrollado en .NET 8 utilizando arquitectura N-Capas.
