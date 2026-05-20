@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # EcoSystem Connect
 
 Proyecto desarrollado en .NET 8 utilizando arquitectura N-Capas.
@@ -40,3 +41,6 @@ Construir la base arquitectónica del proyecto final utilizando el patrón N-Cap
 ## Autor
 
 Luis Cobos
+=======
+# EcoSystem-Project.
+>>>>>>> 29f7a0cd4ea41b04d89ff173de2fa3ebfa04d747
