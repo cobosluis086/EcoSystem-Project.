@@ -39,21 +39,33 @@ CREATE TABLE Productos (
 INSERT INTO Categorias (nombre, descripcion)
 VALUES
 (
-    'Tecnología Verde',
-    'Dispositivos de bajo consumo y soluciones IoT sustentables.'
+    'Computadoras',
+    'Equipos de computo y laptops'
 ),
 (
-    'Energía Renovable',
-    'Paneles solares, inversores y almacenamiento de energía.'
+    'Accesorios',
+    'Perifericos y accesorios para computadora'
 );
 
 INSERT INTO Usuarios (nombre, email, password_hash, rol)
 VALUES
 (
-    'Coordinador EcoSystem',
-    'admin@ecosystem.com',
+    'María González',
+    'maria.gonzalez@empresa.com',
     'AQAAAAIAAYagAAAAEG...',
-    'Administrador'
+    'Gerente de Ventas'
+),
+(
+    'Carlos Ramírez',
+    'carlos.ramirez@empresa.com',
+    'AQAAAAIAAYagAAAAEG...',
+    'Jefe de Inventario'
+),
+(
+    'Ana Martínez',
+    'ana.martinez@empresa.com',
+    'AQAAAAIAAYagAAAAEG...',
+    'Auxiliar Administrativo'
 );
 
 INSERT INTO Productos
@@ -61,11 +73,27 @@ INSERT INTO Productos
 VALUES
 (
     1,
-    'Sensor IoT Humedad v2',
-    'Sensor de bajo consumo para monitoreo de suelos agrícolas.',
-    45.99,
-    120,
-    'ECO-IOT-HUM-02'
+    'Laptop Dell XPS 15',
+    'Laptop de alto rendimiento',
+    28999.99,
+    10,
+    'DELL-XPS15'
+),
+(
+    2,
+    'Mouse Logitech MX Master',
+    'Mouse inalambrico ergonomico',
+    1599.00,
+    50,
+    'LOGI-MXM'
+),
+(
+    2,
+    'Teclado Mecanico Keychron',
+    'Teclado mecanico para programacion',
+    2499.50,
+    30,
+    'KEY-K2'
 );
 
 SELECT * FROM Categorias;
