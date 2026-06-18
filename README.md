@@ -6,23 +6,36 @@ Proyecto desarrollado en .NET 8 utilizando arquitectura N-Capas.
 
 La solución está dividida en capas independientes para mantener el código organizado, escalable y mantenible.
 
-### Capas
+## Capas
 
-- **EcoSystem.API**
-  - Capa de presentación
-  - Expone endpoints HTTP mediante ASP.NET Core Web API
-  - Gestiona solicitudes y respuestas JSON
+### EcoSystem.API
 
-- **EcoSystem.Data**
-  - Capa de acceso a datos
-  - Contiene entidades y configuración de persistencia
+* Capa de presentación.
+* Expone endpoints HTTP mediante ASP.NET Core Web API.
+* Gestiona solicitudes y respuestas en formato JSON.
+* Integra Swagger / OpenAPI para documentar y probar los endpoints.
+
+### EcoSystem.Business
+
+* Capa de lógica de negocio.
+* Contiene servicios e interfaces del sistema.
+* Se encarga de procesar reglas antes de acceder a los datos.
+* Ayuda a separar la lógica del controlador y mantener el proyecto ordenado.
+
+### EcoSystem.Data
+
+* Capa de acceso a datos.
+* Contiene entidades y configuración de persistencia.
+* Administra la conexión con la base de datos.
+* Organiza los modelos utilizados por el sistema.
 
 ## Tecnologías Utilizadas
 
-- .NET 8
-- ASP.NET Core Web API
-- C#
-- Swagger / OpenAPI
+* .NET 8
+* ASP.NET Core Web API
+* C#
+* Swagger / OpenAPI
+* Git y GitHub
 
 ## Estructura de la Solución
 
@@ -30,16 +43,19 @@ La solución está dividida en capas independientes para mantener el código org
 EcoSystem.sln
 │
 ├── EcoSystem.API
+├── EcoSystem.Business
 └── EcoSystem.Data
 ```
 
 ## Objetivo
 
-Construir la base arquitectónica del proyecto final utilizando el patrón N-Capas.
+Construir la base arquitectónica del proyecto final utilizando el patrón N-Capas, separando responsabilidades entre presentación, lógica de negocio y acceso a datos.
 
 ## Autor
 
 Luis Cobos
-=======
-# EcoSystem-Project.
->>>>>>> 29f7a0cd4ea41b04d89ff173de2fa3ebfa04d747
+
+## Repositorio
+
+EcoSystem-Project.
+
