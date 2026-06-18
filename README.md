@@ -66,3 +66,10 @@ Proyecto en desarrollo como parte de la materia Programación III.
 ## Notas
 
 La estructura del proyecto permite mantener el código organizado y facilita futuras mejoras.
+
+## Próximos Pasos
+
+- Implementar más servicios en la capa Business.
+- Conectar controladores con la lógica de negocio.
+- Mejorar la documentación de endpoints.
+
