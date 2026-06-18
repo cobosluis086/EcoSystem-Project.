@@ -62,3 +62,7 @@ EcoSystem-Project.
 ## Estado del Proyecto
 
 Proyecto en desarrollo como parte de la materia Programación III.
+
+## Notas
+
+La estructura del proyecto permite mantener el código organizado y facilita futuras mejoras.
