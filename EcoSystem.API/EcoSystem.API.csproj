@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>EcoSystem.API_</RootNamespace>
+    <UserSecretsId>ef0ae80e-ec29-4abc-ae55-aaacc76c65aa</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
