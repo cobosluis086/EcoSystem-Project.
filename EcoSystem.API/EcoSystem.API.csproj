@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EcoSystem.Data\EcoSystem.DatA.csproj" />
+    <ProjectReference Include="..\EcoSystem.Business\EcoSystem.Business.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,7 @@
 using EcoSystem.Data.Data;
 using Microsoft.EntityFrameworkCore;
+using EcoSystem.Business.Interfaces;
+using EcoSystem.Business.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+builder.Services.AddScoped<IProductoService, ProductoService>();
 
 // Controladores
 builder.Services.AddControllers();
