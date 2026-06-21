@@ -67,9 +67,14 @@ Proyecto en desarrollo como parte de la materia Programación III.
 
 La estructura del proyecto permite mantener el código organizado y facilita futuras mejoras.
 
-## Próximos Pasos
+## Funcionalidades Implementadas
 
-- Implementar más servicios en la capa Business.
-- Conectar controladores con la lógica de negocio.
-- Mejorar la documentación de endpoints.
-
+- Arquitectura N-Capas (API, Business y Data).
+- Conexión a base de datos en la nube mediante Supabase PostgreSQL.
+- Configuración de Entity Framework Core.
+- Implementación de modelos y contexto de datos.
+- CRUD completo de Productos (GET, POST, PUT y DELETE).
+- Controladores REST con ASP.NET Core Web API.
+- Interfaz de servicios en la capa Business.
+- Documentación y pruebas de endpoints con Swagger UI.
+- Control de versiones mediante Git y GitHub.
