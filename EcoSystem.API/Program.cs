@@ -10,6 +10,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+
 builder.Services.AddScoped<IProductoService, ProductoService>();
 
 // Controladores
@@ -22,16 +23,15 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
+// Swagger (habilitado también en producción)
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI();
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// En Render no es necesario redirigir a HTTPS
+// app.UseHttpsRedirection();
 
-app.UseHttpsRedirection();
+app.UseAuthorization();
 
 // Habilitar controladores
 app.MapControllers();
