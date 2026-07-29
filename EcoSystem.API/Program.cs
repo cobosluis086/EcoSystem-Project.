@@ -5,35 +5,42 @@ using EcoSystem.Business.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Base de datos (Supabase PostgreSQL)
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "No se encontró la cadena de conexión DefaultConnection."
+    );
 
+// Base de datos PostgreSQL de Supabase
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString)
+);
+
+// Servicios
 builder.Services.AddScoped<IProductoService, ProductoService>();
 
-// Controladores
+// Controladores y Swagger
 builder.Services.AddControllers();
-
-// OpenAPI / Swagger
-builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger (habilitado también en producción)
-app.MapOpenApi();
+// Swagger habilitado en Render
 app.UseSwagger();
-app.UseSwaggerUI();
 
-// En Render no es necesario redirigir a HTTPS
-// app.UseHttpsRedirection();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint(
+        "/swagger/v1/swagger.json",
+        "EcoSystem API v1"
+    );
+});
 
-app.UseAuthorization();
+// Al abrir la dirección principal, redirige a Swagger
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
-// Habilitar controladores
+// Controladores
 app.MapControllers();
 
 app.Run();
