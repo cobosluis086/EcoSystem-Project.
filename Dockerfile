@@ -4,12 +4,9 @@ WORKDIR /src
 
 COPY . .
 
-RUN dotnet restore EcoSystem.API/EcoSystem.API.csproj
-
 RUN dotnet publish EcoSystem.API/EcoSystem.API.csproj \
     -c Release \
-    -o /app/publish \
-    --no-restore
+    -o /app/publish
 
 # Etapa de ejecución
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
