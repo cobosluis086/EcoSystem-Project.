@@ -64,6 +64,18 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+// CORS para permitir el frontend Blazor
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Controladores
 builder.Services.AddControllers();
 
@@ -99,6 +111,9 @@ var app = builder.Build();
 app.MapOpenApi();
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// CORS debe ejecutarse antes de autenticación y autorización
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 
