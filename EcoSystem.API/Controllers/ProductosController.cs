@@ -20,7 +20,8 @@ namespace EcoSystem.API.Controllers
             _productoService = productoService;
         }
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [AllowAnonymous]
         // GET: api/Productos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Producto>>> GetProductos()
@@ -30,6 +31,7 @@ namespace EcoSystem.API.Controllers
         }
 
         // GET: api/Productos/{id}
+        [AllowAnonymous]
         [HttpGet("{id}")]
 
         public async Task<ActionResult<Producto>> GetProducto(int id)

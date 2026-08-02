@@ -1,0 +1,79 @@
+@page "/productos"
+@using EcoSystem.Client.Models
+@using EcoSystem.Client.ViewModels
+@inject ProductoListViewModel ViewModel
+
+<PageTitle>Productos</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Productos</h1>
+            <p class="text-muted">Productos registrados en EcoSystem.</p>
+        </div>
+
+        <button class="btn btn-primary" @onclick="LoadProductos" disabled="@ViewModel.IsLoading">
+            Actualizar
+        </button>
+    </div>
+
+    @if (ViewModel.IsLoading)
+    {
+        <div class="alert alert-info">
+            Cargando productos...
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            @ViewModel.ErrorMessage
+        </div>
+    }
+    else if (ViewModel.Productos.Count == 0)
+    {
+        <div class="alert alert-warning">
+            No hay productos registrados.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (Producto producto in ViewModel.Productos)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@producto.Nombre</h5>
+
+                            <p>
+                                <strong>Precio:</strong>
+                                @producto.Precio.ToString("C")
+                            </p>
+
+                            <p>
+                                <strong>Stock:</strong>
+                                @producto.Stock
+                            </p>
+
+                            <a class="btn btn-outline-primary" href="@($"/productos/{producto.Id}")">
+                                Ver detalle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadProductosAsync();
+    }
+
+    private Task LoadProductos()
+    {
+        return ViewModel.LoadProductosAsync();
+    }
+}

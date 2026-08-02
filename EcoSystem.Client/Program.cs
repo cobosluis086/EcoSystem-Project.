@@ -9,20 +9,18 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// Cliente HTTP principal
-builder.Services.AddScoped(sp =>
+builder.Services.AddScoped(_ =>
     new HttpClient
     {
-        BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+        BaseAddress = new Uri(
+            "https://ecosystem-project-4hpi.onrender.com/"
+        )
     });
 
-// Servicios
 builder.Services.AddScoped<ApiService>();
-builder.Services.AddScoped<EcosystemService>();
+builder.Services.AddScoped<ProductoService>();
 
-// ViewModels
-builder.Services.AddScoped<MainViewModel>();
-builder.Services.AddScoped<EcosystemListViewModel>();
-builder.Services.AddScoped<EcosystemDetailViewModel>();
+builder.Services.AddScoped<ProductoListViewModel>();
+builder.Services.AddScoped<ProductoDetailViewModel>();
 
 await builder.Build().RunAsync();

@@ -1,0 +1,61 @@
+@page "/productos/{Id:int}"
+@using EcoSystem.Client.ViewModels
+@inject ProductoDetailViewModel ViewModel
+
+<PageTitle>Detalle del producto</PageTitle>
+
+<div class="container mt-4">
+    @if (ViewModel.IsLoading)
+    {
+        <div class="alert alert-info">
+            Cargando producto...
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            @ViewModel.ErrorMessage
+        </div>
+
+        <a class="btn btn-secondary" href="/productos">
+            Regresar
+        </a>
+    }
+    else if (ViewModel.Producto is not null)
+    {
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1>@ViewModel.Producto.Nombre</h1>
+
+                <p>
+                    <strong>ID:</strong>
+                    @ViewModel.Producto.Id
+                </p>
+
+                <p>
+                    <strong>Precio:</strong>
+                    @ViewModel.Producto.Precio.ToString("C")
+                </p>
+
+                <p>
+                    <strong>Stock:</strong>
+                    @ViewModel.Producto.Stock
+                </p>
+
+                <a class="btn btn-secondary" href="/productos">
+                    Regresar a productos
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return ViewModel.LoadProductoAsync(Id);
+    }
+}
