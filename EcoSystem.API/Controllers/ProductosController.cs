@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EcoSystem.Data.Models;
 using EcoSystem.Business.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EcoSystem.API.Controllers
 {
@@ -19,6 +20,7 @@ namespace EcoSystem.API.Controllers
             _productoService = productoService;
         }
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
         // GET: api/Productos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Producto>>> GetProductos()
@@ -29,6 +31,7 @@ namespace EcoSystem.API.Controllers
 
         // GET: api/Productos/{id}
         [HttpGet("{id}")]
+
         public async Task<ActionResult<Producto>> GetProducto(int id)
         {
             var producto = await _productoService.GetProductoByIdAsync(id);
