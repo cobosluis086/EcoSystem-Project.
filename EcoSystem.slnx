@@ -4,4 +4,5 @@
   </Folder>
   <Project Path="EcoSystem.API/EcoSystem.API.csproj" />
   <Project Path="EcoSystem.Business/EcoSystem.Business.csproj" />
+  <Project Path="EcoSystem.Client/EcoSystem.Client.csproj" />
 </Solution>

@@ -2,45 +2,115 @@ using EcoSystem.Data.Data;
 using Microsoft.EntityFrameworkCore;
 using EcoSystem.Business.Interfaces;
 using EcoSystem.Business.Services;
+using EcoSystem.Data.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString =
-    builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException(
-        "No se encontró la cadena de conexión DefaultConnection."
-    );
+var jwtSettings = builder.Configuration
+    .GetSection("JwtSettings")
+    .Get<JwtSettings>();
 
-// Base de datos PostgreSQL de Supabase
+if (jwtSettings is null)
+{
+    throw new InvalidOperationException(
+        "No se encontró la configuración JwtSettings.");
+}
+
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("JwtSettings"));
+
+// Base de datos PostgreSQL / Supabase
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString)
-);
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 
 // Servicios
 builder.Services.AddScoped<IProductoService, ProductoService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Controladores y Swagger
+// Autenticación JWT
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+
+        options.DefaultChallengeScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+// Controladores
 builder.Services.AddControllers();
+
+// OpenAPI / Swagger
+builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Ingresa el token JWT."
+    });
+
+    options.AddSecurityRequirement(document =>
+        new OpenApiSecurityRequirement
+        {
+            [
+                new OpenApiSecuritySchemeReference(
+                    "Bearer",
+                    document
+                )
+            ] = []
+        });
+});
 
 var app = builder.Build();
 
-// Swagger habilitado en Render
+// Swagger disponible también en Render
+app.MapOpenApi();
 app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseSwaggerUI(options =>
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapGet("/", () => Results.Ok(new
 {
-    options.SwaggerEndpoint(
-        "/swagger/v1/swagger.json",
-        "EcoSystem API v1"
-    );
-});
+    mensaje = "EcoSystem API funcionando correctamente",
+    swagger = "/swagger"
+}));
 
-// Al abrir la dirección principal, redirige a Swagger
-app.MapGet("/", () => Results.Redirect("/swagger"));
-
-// Controladores
 app.MapControllers();
 
 app.Run();

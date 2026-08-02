@@ -1,0 +1,34 @@
+@page "/ecosystem"
+@using EcoSystem.Client.Models
+@using EcoSystem.Client.ViewModels
+@inject MainViewModel ViewModel
+
+<PageTitle>EcoSystem Connect</PageTitle>
+
+<div class="container mt-4">
+    <h1>@ViewModel.Title</h1>
+
+    <p>
+        Frontend multiplataforma desarrollado con Blazor WebAssembly
+        y arquitectura MVVM.
+    </p>
+
+    @if (ViewModel.Ecosystems.Count == 0)
+    {
+        <div class="alert alert-info">
+            La lista de ecosistemas está lista para conectarse con la API.
+        </div>
+    }
+    else
+    {
+        @foreach (Ecosystem ecosystem in ViewModel.Ecosystems)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">@ecosystem.Name</h5>
+                    <p class="card-text">@ecosystem.Description</p>
+                </div>
+            </div>
+        }
+    }
+</div>
