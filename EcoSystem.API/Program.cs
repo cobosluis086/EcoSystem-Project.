@@ -5,10 +5,14 @@ using EcoSystem.Business.Services;
 using EcoSystem.Data.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ==============================
+// JWT
+// ==============================
 
 var jwtSettings = builder.Configuration
     .GetSection("JwtSettings")
@@ -23,17 +27,26 @@ if (jwtSettings is null)
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 
-// Base de datos PostgreSQL / Supabase
+// ==============================
+// Base de datos (Supabase)
+// ==============================
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 
+// ==============================
 // Servicios
+// ==============================
+
 builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Autenticación JWT
+// ==============================
+// JWT Authentication
+// ==============================
+
 builder.Services
     .AddAuthentication(options =>
     {
@@ -45,26 +58,32 @@ builder.Services
     })
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
 
-            ValidIssuer = jwtSettings.Issuer,
-            ValidAudience = jwtSettings.Audience,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtSettings.SecretKey)
+                    ),
 
-            ClockSkew = TimeSpan.Zero
-        };
+                ClockSkew = TimeSpan.Zero
+            };
     });
 
 builder.Services.AddAuthorization();
 
-// CORS para permitir el frontend Blazor
+// ==============================
+// CORS
+// ==============================
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -76,50 +95,76 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Controladores
+// ==============================
+// Controllers
+// ==============================
+
 builder.Services.AddControllers();
 
-// OpenAPI / Swagger
-builder.Services.AddOpenApi();
+// ==============================
+// Swagger
+// ==============================
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        Description = "Ingresa el token JWT."
+        Title = "EcoSystem API",
+        Version = "v1",
+        Description = "API del proyecto EcoSystem"
     });
 
-    options.AddSecurityRequirement(document =>
-        new OpenApiSecurityRequirement
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Ingrese el token JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
-            [
-                new OpenApiSecuritySchemeReference(
-                    "Bearer",
-                    document
-                )
-            ] = []
-        });
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 var app = builder.Build();
 
-// Swagger disponible también en Render
-app.MapOpenApi();
-app.UseSwagger();
-app.UseSwaggerUI();
+// ==============================
+// Middleware
+// ==============================
 
-// CORS debe ejecutarse antes de autenticación y autorización
-app.UseCors("AllowFrontend");
+app.UseSwagger();
+
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "EcoSystem API v1");
+    c.RoutePrefix = "swagger";
+});
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
+// Página principal
 app.MapGet("/", () => Results.Ok(new
 {
     mensaje = "EcoSystem API funcionando correctamente",
