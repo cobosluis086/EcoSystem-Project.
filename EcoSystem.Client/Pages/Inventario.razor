@@ -1,0 +1,248 @@
+@page "/inventario"
+@using EcoSystem.Client.Models
+@using EcoSystem.Client.ViewModels
+@using EcoSystem.Client.Services
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+@inject ProductoListViewModel ViewModel
+
+<PageTitle>Inventario</PageTitle>
+
+<div class="container mt-4">
+
+    @if (isCheckingAccess)
+    {
+        <div class="alert alert-info">
+            Verificando permisos...
+        </div>
+    }
+    else if (hasAccess)
+    {
+        <div class="mb-4">
+            <h1>Inventario</h1>
+
+            <p class="text-muted">
+                Registra productos nuevos y consulta las existencias actuales.
+            </p>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    Agregar producto al inventario
+                </h4>
+            </div>
+
+            <div class="card-body">
+                <EditForm Model="ViewModel.NuevoProducto" OnValidSubmit="GuardarProducto">
+
+                    <DataAnnotationsValidator />
+
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">
+                                Nombre del producto
+                            </label>
+
+                            <InputText class="form-control" placeholder="Ejemplo: Monitor Samsung"
+                                       @bind-Value="ViewModel.NuevoProducto.Nombre" />
+
+                            <ValidationMessage For="@(() => ViewModel.NuevoProducto.Nombre)" />
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">
+                                Precio
+                            </label>
+
+                            <InputNumber class="form-control" step="0.01" @bind-Value="ViewModel.NuevoProducto.Precio" />
+
+                            <ValidationMessage For="@(() => ViewModel.NuevoProducto.Precio)" />
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">
+                                Stock
+                            </label>
+
+                            <InputNumber class="form-control" @bind-Value="ViewModel.NuevoProducto.Stock" />
+
+                            <ValidationMessage For="@(() => ViewModel.NuevoProducto.Stock)" />
+                        </div>
+
+                        <div class="col-md-2 mb-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100" disabled="@ViewModel.IsSaving">
+
+                                @if (ViewModel.IsSaving)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2">
+                                    </span>
+
+                                    <span>Guardando...</span>
+                                }
+                                else
+                                {
+                                    <span>Agregar</span>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
+
+                @if (!string.IsNullOrWhiteSpace(ViewModel.SuccessMessage))
+                {
+                    <div class="alert alert-success mb-0">
+                        @ViewModel.SuccessMessage
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+                {
+                    <div class="alert alert-danger mb-0">
+                        @ViewModel.ErrorMessage
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    Existencias actuales
+                </h4>
+
+                <button class="btn btn-outline-primary" @onclick="ActualizarInventario" disabled="@ViewModel.IsLoading">
+                    Actualizar
+                </button>
+            </div>
+
+            <div class="card-body">
+                @if (ViewModel.IsLoading)
+                {
+                    <div class="alert alert-info">
+                        Cargando inventario...
+                    </div>
+                }
+                else if (ViewModel.Productos.Count == 0)
+                {
+                    <div class="alert alert-warning">
+                        No hay productos registrados.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (Producto producto in ViewModel.Productos)
+                                {
+                                    <tr>
+                                        <td>@producto.Id</td>
+
+                                        <td>@producto.Nombre</td>
+
+                                        <td>
+                                            @producto.Precio.ToString(
+                                                "C",
+                                                new System.Globalization.CultureInfo("es-MX"))
+                                        </td>
+
+                                        <td>@producto.Stock</td>
+
+                                        <td>
+                                            @if (producto.Stock == 0)
+                                            {
+                                                <span class="badge bg-danger">
+                                                    Agotado
+                                                </span>
+                                            }
+                                            else if (producto.Stock <= 10)
+                                            {
+                                                <span class="badge bg-warning text-dark">
+                                                    Stock bajo
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">
+                                                    Disponible
+                                                </span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isCheckingAccess = true;
+    private bool hasAccess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated =
+            await AuthService.IsAuthenticatedAsync();
+
+        if (!isAuthenticated)
+        {
+            NavigationManager.NavigateTo(
+                "/login",
+                replace: true);
+
+            return;
+        }
+
+        var isAdmin =
+            await AuthService.IsAdminAsync();
+
+        if (!isAdmin)
+        {
+            NavigationManager.NavigateTo(
+                "/productos",
+                replace: true);
+
+            return;
+        }
+
+        hasAccess = true;
+        isCheckingAccess = false;
+
+        await ViewModel.LoadProductosAsync();
+    }
+
+    private async Task GuardarProducto()
+    {
+        if (!hasAccess)
+        {
+            return;
+        }
+
+        await ViewModel.GuardarProductoAsync();
+    }
+
+    private async Task ActualizarInventario()
+    {
+        if (!hasAccess)
+        {
+            return;
+        }
+
+        await ViewModel.LoadProductosAsync();
+    }
+}

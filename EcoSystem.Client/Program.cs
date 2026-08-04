@@ -17,6 +17,7 @@ builder.Services.AddScoped(_ =>
 
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<ProductoService>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddScoped<ProductoListViewModel>();
 builder.Services.AddScoped<ProductoDetailViewModel>();

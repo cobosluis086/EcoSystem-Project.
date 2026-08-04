@@ -1,0 +1,117 @@
+@page "/login"
+@using EcoSystem.Client.Models
+@using EcoSystem.Client.Services
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Iniciar sesión</PageTitle>
+
+<div class="login-page">
+    <div class="login-card">
+        <div class="brand-section">
+            <div class="brand-icon">🌱</div>
+
+            <h1>EcoSystem</h1>
+
+            <p>
+                Inicia sesión para administrar los productos
+                del sistema.
+            </p>
+        </div>
+
+        <EditForm Model="loginRequest" OnValidSubmit="HandleLoginAsync">
+
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label for="email">
+                    Correo electrónico
+                </label>
+
+                <InputText id="email" class="form-control" type="email" placeholder="usuario@correo.com"
+                           @bind-Value="loginRequest.Email" />
+
+                <ValidationMessage For="@(() => loginRequest.Email)" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    Contraseña
+                </label>
+
+                <InputText id="password" class="form-control" type="password" placeholder="Escribe tu contraseña"
+                           @bind-Value="loginRequest.Password" />
+
+                <ValidationMessage For="@(() => loginRequest.Password)" />
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <div class="alert alert-danger">
+                    @errorMessage
+                </div>
+            }
+
+            <button type="submit" class="login-button" disabled="@isLoading">
+
+                @if (isLoading)
+                {
+                    <span class="spinner-border spinner-border-sm me-2">
+                    </span>
+
+                    <span>Iniciando sesión...</span>
+                }
+                else
+                {
+                    <span>Iniciar sesión</span>
+                }
+            </button>
+        </EditForm>
+
+        <p class="security-text">
+            Acceso protegido mediante autenticación JWT.
+        </p>
+    </div>
+</div>
+
+@code {
+    private readonly LoginRequest loginRequest = new();
+
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            NavigationManager.NavigateTo(
+                "/productos",
+                replace: true);
+        }
+    }
+
+    private async Task HandleLoginAsync()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = string.Empty;
+
+            var result = await AuthService.LoginAsync(loginRequest);
+
+            if (!result.Success)
+            {
+                errorMessage = result.Message;
+                return;
+            }
+
+            NavigationManager.NavigateTo(
+                "/productos",
+                replace: true);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

@@ -1,4 +1,9 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using EcoSystem.Client.Services
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">EcoSystem</a>
     </div>
@@ -7,17 +12,95 @@
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                Inicio
-            </NavLink>
-        </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="productos">
-                Productos
-            </NavLink>
-        </div>
+    <nav class="flex-column">
+
+        @if (isAuthenticated)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    Inicio
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="productos">
+                    Productos
+                </NavLink>
+            </div>
+
+            @if (isAdmin)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="inventario">
+                        Inventario
+                    </NavLink>
+                </div>
+            }
+
+            <hr class="text-light mx-3" />
+
+            <div class="px-3 mb-3 text-light">
+                <div class="fw-bold">
+                    @userName
+                </div>
+
+                <small>
+                    Rol: @userRole
+                </small>
+            </div>
+
+            <div class="nav-item px-3">
+                <button class="btn btn-outline-light w-100" @onclick="CerrarSesion">
+                    Cerrar sesión
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="login">
+                    Iniciar sesión
+                </NavLink>
+            </div>
+        }
+
     </nav>
 </div>
+
+@code {
+    private bool isAuthenticated;
+    private bool isAdmin;
+
+    private string userName = string.Empty;
+    private string userRole = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isAuthenticated =
+            await AuthService.IsAuthenticatedAsync();
+
+        if (!isAuthenticated)
+        {
+            return;
+        }
+
+        userName =
+            await AuthService.GetUserNameAsync();
+
+        userRole =
+            await AuthService.GetUserRoleAsync();
+
+        isAdmin =
+            await AuthService.IsAdminAsync();
+    }
+
+    private async Task CerrarSesion()
+    {
+        await AuthService.LogoutAsync();
+
+        NavigationManager.NavigateTo(
+            "/login",
+            forceLoad: true);
+    }
+}

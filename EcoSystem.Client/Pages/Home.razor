@@ -1,16 +1,87 @@
 ﻿@page "/"
+@using EcoSystem.Client.Services
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
 
-<PageTitle>EcoSystem</PageTitle>
+<PageTitle>Inicio</PageTitle>
 
 <div class="container mt-4">
-    <h1>EcoSystem</h1>
+    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+        <div class="container-fluid py-4">
+            <h1 class="display-5 fw-bold">
+                Bienvenido a EcoSystem
+            </h1>
 
-    <p>
-        Aplicación frontend desarrollada con Blazor WebAssembly
-        y arquitectura MVVM.
-    </p>
+            <p class="col-md-8 fs-5">
+                Desde este panel puedes consultar los productos,
+                revisar el inventario y administrar la información
+                disponible en el sistema.
+            </p>
 
-    <a class="btn btn-primary" href="/productos">
-        Ver productos
-    </a>
+            <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-primary btn-lg" href="/productos">
+                    Ver productos
+                </a>
+
+                <a class="btn btn-success btn-lg" href="/inventario">
+                    Ver inventario
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        Productos
+                    </h4>
+
+                    <p class="card-text">
+                        Consulta el nombre, precio, stock y detalle
+                        de los productos registrados.
+                    </p>
+
+                    <a class="btn btn-outline-primary" href="/productos">
+                        Ir a productos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        Inventario
+                    </h4>
+
+                    <p class="card-text">
+                        Revisa las existencias y detecta productos
+                        agotados o con stock bajo.
+                    </p>
+
+                    <a class="btn btn-outline-success" href="/inventario">
+                        Ir al inventario
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated =
+            await AuthService.IsAuthenticatedAsync();
+
+        if (!isAuthenticated)
+        {
+            NavigationManager.NavigateTo(
+                "/login",
+                replace: true);
+        }
+    }
+}

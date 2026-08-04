@@ -5,7 +5,7 @@ using EcoSystem.Business.Services;
 using EcoSystem.Data.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -126,20 +126,15 @@ builder.Services.AddSwaggerGen(options =>
         BearerFormat = "JWT"
     });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(document =>
+{
+    var bearerScheme = document.Components?.SecuritySchemes["Bearer"];
+
+    return new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    };
+});
 });
 
 var app = builder.Build();
